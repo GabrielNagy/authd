@@ -27,7 +27,7 @@ jobs:
       - name: Install dependencies
         run: |
           DEBIAN_FRONTEND=noninteractive apt update
-          DEBIAN_FRONTEND=noninteractive apt install -y cargo dh-cargo git jq
+          DEBIAN_FRONTEND=noninteractive apt install -y cargo dh-cargo git jq gh
       - uses: actions/checkout@v4
         with:
           ref: main
