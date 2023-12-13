@@ -55,16 +55,24 @@ jobs:
       - name: work around permission issue with git vulnerability (we are local here). TO REMOVE
         run: git config --global --add safe.directory "$PWD"
       - name: Create Pull Request
+        id: cpr
         if: ${{ env.modified == 'true' }}
         uses: peter-evans/create-pull-request@v5
         with:
           commit-message: Auto update packaging related Rust files
           title: Auto update packaging related Rust files
+          body: _This pull request will auto-merge if all required checks pass_
           labels: control, automated pr
           branch: auto-update-rust-packaging
           delete-branch: true
           token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Push branch
-        if: ${{ env.modified == 'true' }}
-        run: |
-          git push origin auto-update-rust-packaging:main
+      - name: Auto-approve Pull Request
+        if: steps.cpr.outputs.pull-request-operation == 'created'
+        run: gh pr review --approve "${{ steps.cpr.outputs.pull-request-number }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Enable Pull Request Automerge
+        if: steps.cpr.outputs.pull-request-operation == 'created'
+        run: gh pr merge --merge --auto "${{ steps.cpr.outputs.pull-request-number }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
