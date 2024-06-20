@@ -28,6 +28,12 @@ insert_nss_entry() {
     ' /etc/nsswitch.conf
 }
 
+enable_pam_mkhomedir() {
+    log "Enabling PAM mkhomedir module..."
+
+    pam-auth-update --package --enable mkhomedir
+}
+
 action="$1"
 
 if [ configure = "$action" ]; then
@@ -38,5 +44,6 @@ if [ configure = "$action" ]; then
         # first install: setup the recommended configuration (unless
         # nsswitch.conf already contains authd entries)
         insert_nss_entry
+        enable_pam_mkhomedir
     fi
 fi
